@@ -34,7 +34,10 @@ namespace StartStopSerialServer
                         _awaiter.Release();
                     }
                 }
-                else if(_cts is not null && !_cts.IsCancellationRequested) _cts.Cancel();
+                else
+                {
+                    if (_cts is not null && !_cts.IsCancellationRequested) _cts.Cancel();
+                }
             };
         }
         SemaphoreSlim 
