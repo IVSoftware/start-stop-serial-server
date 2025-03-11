@@ -9,7 +9,7 @@ namespace MockSerialPort
     public enum SerialData{Chars = 1, Eof }
     public class SerialPort 
     {
-        Random _rando = new Random(2);
+        Random _rando = new Random(3);
         public int BytesToRead => _rx.Count;
         public void Open() => IsOpen = true;
         public bool IsOpen

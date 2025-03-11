@@ -8,35 +8,47 @@ namespace StartStopSerialServer
         public MainForm()
         {
             InitializeComponent();
-            checkBoxToggleServer.CheckedChanged += async (sender, e) =>
+
+            _serialPort.DataReceived += async (sender, e) =>
+            {
+                await _criticalSection.WaitAsync();
+                if (!IsDisposed) BeginInvoke((MethodInvoker)delegate
+                {
+                    try
+                    {
+                        if (sender is SerialPort port)
+                        {
+                            while (port.BytesToRead > 0)
+                            {
+                                byte[] buffer = new byte[16];
+                                int success = port.Read(buffer, 0, buffer.Length);
+                                BeginInvoke(() =>
+                                {
+                                    txtbox_log.AppendText(
+                                        BitConverter.ToString(buffer, 0, success).Replace("-", " "),
+                                        true);
+                                });
+                            }
+                        }
+                    }
+                    finally
+                    {
+                        _criticalSection.Release();
+                    }
+                });
+            };
+
+            checkBoxToggleServer.CheckedChanged += (sender, e) =>
             {
                 if (checkBoxToggleServer.Checked)
                 {
-                    _cts?.Cancel();
-                    // Wait for previous run (if any) to cancel
-                    await _awaiter.WaitAsync();
-                    _cts = new CancellationTokenSource();
-                    try
-                    {
-                        txtbox_log.AppendText("Serial Server Started", true, Color.Green);
-                        while (true)
-                        {
-                            _cts.Token.ThrowIfCancellationRequested();
-                            txtbox_log.AppendText($@"[{DateTime.Now:hh\:mm\:ss\ tt}] TEST! I'm running", true, Color.Blue);
-                            await Task.Delay(TimeSpan.FromSeconds(2.5), _cts.Token);
-                        }
-                    }
-                    catch (OperationCanceledException)
-                    {
-                        txtbox_log.AppendText("Serial Server Canceled", true, Color.Maroon);
-                        checkBoxToggleServer.Checked = false;
-                        _awaiter.Wait(0);
-                        _awaiter.Release();
-                    }
+                    _serialPort.Open();
+                    txtbox_log.AppendText("Serial Server Started", true, Color.Green);
                 }
                 else
                 {
-                    if (_cts is not null && !_cts.IsCancellationRequested) _cts.Cancel();
+                    _serialPort.Close();
+                    txtbox_log.AppendText("Serial Server Canceled", true, Color.Maroon);
                 }
             };
         }
