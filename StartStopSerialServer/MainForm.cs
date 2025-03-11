@@ -20,7 +20,7 @@ namespace StartStopSerialServer
                         {
                             while (port.BytesToRead > 0)
                             {
-                                byte[] buffer = new byte[16];
+                                byte[] buffer = new byte[Math.Min(port.BytesToRead, 16)];
                                 int success = port.Read(buffer, 0, buffer.Length);
                                 BeginInvoke(() => 
                                 { 
