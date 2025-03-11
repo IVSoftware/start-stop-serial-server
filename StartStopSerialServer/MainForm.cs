@@ -21,8 +21,14 @@ namespace StartStopSerialServer
                         while (true)
                         {
                             _cts.Token.ThrowIfCancellationRequested();
-                            txtbox_log.AppendText($@"[{DateTime.Now:hh\:mm\:ss\ tt}] TEST! I'm running", true, Color.Blue);
-                            await Task.Delay(TimeSpan.FromSeconds(2.5), _cts.Token);
+                            var timestamp = $@"[{DateTime.Now:hh\:mm\:ss\ tt}] ";
+                            txtbox_log.AppendText($"{timestamp} TEST! I'm running", true, Color.Blue);
+                            await Task.Delay(TimeSpan.FromSeconds(1.5), _cts.Token); // Taken from posted code.
+                            await Task.Run(() => 
+                            {
+                                // "do some more serial stuff here"
+                                _cts.Token.ThrowIfCancellationRequested();
+                            }, _cts.Token);
                         }
                     }
                     catch (OperationCanceledException)
