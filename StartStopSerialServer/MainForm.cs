@@ -22,11 +22,10 @@ namespace StartStopSerialServer
                             {
                                 byte[] buffer = new byte[16];
                                 int success = port.Read(buffer, 0, buffer.Length);
-                                BeginInvoke(() =>
-                                {
-                                    txtbox_log.AppendText(
-                                        BitConverter.ToString(buffer, 0, success).Replace("-", " "),
-                                        true);
+                                BeginInvoke(() => 
+                                { 
+                                    txtbox_log.AppendText($@"[{DateTime.Now:hh\:mm\:ss.ff tt}] ", false, Color.CornflowerBlue);
+                                    txtbox_log.AppendText( BitConverter.ToString(buffer, 0, success).Replace("-", " "),  true);
                                 });
                             }
                         }
@@ -43,7 +42,7 @@ namespace StartStopSerialServer
                 if (checkBoxToggleServer.Checked)
                 {
                     _serialPort.Open();
-                    txtbox_log.AppendText("Serial Server Started", true, Color.Green);
+                    txtbox_log.AppendText($"Serial Server Started", true, Color.Green);
                 }
                 else
                 {
