@@ -4,7 +4,6 @@ namespace StartStopSerialServer
 {
     public partial class MainForm : Form
     {
-        SerialPort _serialPort = new();
         public MainForm()
         {
             InitializeComponent();
